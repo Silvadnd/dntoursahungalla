@@ -1,0 +1,23 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Messages folder (contact form submissions)
+messages/
+
+# Uploads folder (user uploaded content)
+uploads/
+php/uploads/
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Composer vendor (optional - uncomment if you want to exclude)
+# vendor/

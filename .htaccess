@@ -1,13 +1,14 @@
-# Redirect HTML files to PHP equivalents
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
 RewriteEngine On
+RewriteBase /
 
-# Redirect index.html to index.php
+# Allow access to index.php at root
+DirectoryIndex index.php index.html
+
+# Redirect HTML files to PHP equivalents
 RewriteRule ^index\.html$ index.php [R=301,L]
-
-# Redirect about.html to about.php
 RewriteRule ^about\.html$ php/about.php [R=301,L]
-
-# Redirect other HTML files to PHP (when they exist)
 RewriteRule ^gallery\.html$ php/gallery.php [R=301,L]
 RewriteRule ^destinations\.html$ php/destinations.php [R=301,L]
 RewriteRule ^tours\.html$ php/tours.php [R=301,L]
@@ -18,14 +19,22 @@ RewriteRule ^contact\.html$ php/contact.php [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
+</IfModule>
 
 # Security: Prevent access to sensitive files
-<Files "config.php">
-    Order allow,deny
-    Deny from all
-</Files>
+<FilesMatch "^(config\.php|email_config\.php|database_setup\.sql)$">
+    Require all denied
+</FilesMatch>
 
-<Files "database_setup.sql">
-    Order allow,deny
-    Deny from all
-</Files> 
+# Prevent directory listing
+Options -Indexes
+
+# Allow access to assets, CSS, JS
+<FilesMatch "\.(jpg|jpeg|png|gif|css|js|ico|svg|woff|woff2|ttf|eot)$">
+    Require all granted
+</FilesMatch>
+
+# Allow access to PHP files
+<FilesMatch "\.php$">
+    Require all granted
+</FilesMatch> 
