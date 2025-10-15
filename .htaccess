@@ -1,0 +1,31 @@
+# Redirect HTML files to PHP equivalents
+RewriteEngine On
+
+# Redirect index.html to index.php
+RewriteRule ^index\.html$ index.php [R=301,L]
+
+# Redirect about.html to about.php
+RewriteRule ^about\.html$ php/about.php [R=301,L]
+
+# Redirect other HTML files to PHP (when they exist)
+RewriteRule ^gallery\.html$ php/gallery.php [R=301,L]
+RewriteRule ^destinations\.html$ php/destinations.php [R=301,L]
+RewriteRule ^tours\.html$ php/tours.php [R=301,L]
+RewriteRule ^services\.html$ php/services.php [R=301,L]
+RewriteRule ^contact\.html$ php/contact.php [R=301,L]
+
+# Make PHP files accessible without extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# Security: Prevent access to sensitive files
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "database_setup.sql">
+    Order allow,deny
+    Deny from all
+</Files> 

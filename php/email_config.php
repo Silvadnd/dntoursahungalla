@@ -1,0 +1,1 @@
+<?php define('SMTP_HOST','smtp.gmail.com');define('SMTP_PORT',587);define('SMTP_SECURE','tls');define('SMTP_USERNAME','dinethrap2002@gmail.com');define('SMTP_PASSWORD','your_app_password_here');define('USE_SMTP_FALLBACK',true);define('CONTACT_EMAIL','dinethrap2002@gmail.com');define('FROM_NAME','DN Tours Ahungalla');define('EMAIL_DEBUG',true); ?>

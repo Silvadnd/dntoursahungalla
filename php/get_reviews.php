@@ -1,0 +1,1 @@
+<?php header('Content-Type: application/json');require_once 'config.php';try{$stmt=$pdo->prepare("SELECT * FROM reviews WHERE approved = 1 ORDER BY created_at DESC");$stmt->execute();$reviews=$stmt->fetchAll();echo json_encode(['success'=>true,'reviews'=>$reviews]);}catch(Exception $e){echo json_encode(['success'=>false,'message'=>$e->getMessage()]);} ?>
