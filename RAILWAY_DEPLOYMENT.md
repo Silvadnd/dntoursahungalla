@@ -20,36 +20,48 @@
 
 ### Step 3: Configure Environment Variables
 
-Railway will automatically create these variables when you add MySQL:
-- `MYSQL_URL`
-- `MYSQL_HOST`
-- `MYSQL_DATABASE`
-- `MYSQL_USER`
-- `MYSQL_PASSWORD`
-- `MYSQL_PORT`
+Railway automatically creates these variables when you add MySQL:
+- `MYSQL_URL` (full connection string)
+- `MYSQLHOST`
+- `MYSQLDATABASE`
+- `MYSQLUSER`
+- `MYSQLPASSWORD`
+- `MYSQLPORT`
 
-You need to create these variables pointing to the MySQL values:
+**IMPORTANT:** The code now automatically detects and uses Railway's MySQL variables!
+
+#### Option A: Automatic (Recommended)
+Railway's variables are automatically detected. No manual configuration needed!
+
+#### Option B: Manual (if Option A doesn't work)
+If you still see connection errors, manually set these:
 
 1. Click on your web service
 2. Go to "Variables" tab
-3. Add these variables:
+3. Add these variables with reference to MySQL service:
 
 ```
-DB_HOST = ${{MySQL.MYSQL_HOST}}
-DB_NAME = ${{MySQL.MYSQL_DATABASE}}
-DB_USER = ${{MySQL.MYSQL_USER}}
-DB_PASSWORD = ${{MySQL.MYSQL_PASSWORD}}
-DB_PORT = ${{MySQL.MYSQL_PORT}}
+DB_HOST = ${{MySQL.MYSQLHOST}}
+DB_NAME = ${{MySQL.MYSQLDATABASE}}
+DB_USER = ${{MySQL.MYSQLUSER}}
+DB_PASSWORD = ${{MySQL.MYSQLPASSWORD}}
+DB_PORT = ${{MySQL.MYSQLPORT}}
 ```
 
-**Or manually copy the values:**
+### Step 3.5: Test Database Connection
+
+After deployment, visit:
 ```
-DB_HOST = (copy from MYSQL_HOST)
-DB_NAME = (copy from MYSQL_DATABASE)
-DB_USER = (copy from MYSQL_USER)
-DB_PASSWORD = (copy from MYSQL_PASSWORD)
-DB_PORT = 3306
+https://your-app.railway.app/test_db_connection.php
 ```
+
+This will show you:
+- Environment variables status
+- PHP extensions available
+- Connection test results
+- Debugging information
+
+**IMPORTANT:** Delete `test_db_connection.php` after debugging for security!
 
 ### Step 4: Import Database Schema
 
@@ -175,6 +187,11 @@ After deployment, test these pages:
 **"Connection failed: could not find driver"**
 - ✅ Fixed by `nixpacks.toml`
 - Railway will install PDO MySQL on next deployment
+
+**"Connection failed: No such file or directory"**
+- ✅ Fixed by forcing TCP/IP connection (not Unix socket)
+- Uses 127.0.0.1 instead of localhost for proper connection
+- Auto-detects Railway environment
 
 **"403 Forbidden"**
 - ✅ Fixed by updated `.htaccess`

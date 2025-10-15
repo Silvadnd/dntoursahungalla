@@ -1,8 +1,26 @@
 [phases.setup]
-nixPkgs = ["php82", "php82Extensions.pdo", "php82Extensions.pdo_mysql", "php82Extensions.mysqli", "php82Extensions.mbstring"]
+nixPkgs = [
+    "php82",
+    "php82Extensions.pdo",
+    "php82Extensions.pdo_mysql",
+    "php82Extensions.mysqli",
+    "php82Extensions.mbstring",
+    "php82Extensions.curl",
+    "php82Extensions.openssl"
+]
 
 [phases.install]
-cmds = ["echo 'Installing dependencies...'"]
+cmds = [
+    "echo 'Installing PHP dependencies...'",
+    "echo 'Checking PHP version...'",
+    "php -v",
+    "echo 'Checking PHP extensions...'",
+    "php -m | grep -i pdo",
+    "php -m | grep -i mysql"
+]
 
 [start]
 cmd = "php -S 0.0.0.0:$PORT -t ."
+
+[variables]
+PHP_VERSION = "8.2"
