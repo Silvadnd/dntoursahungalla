@@ -1,4 +1,10 @@
 <?php
+// Suppress any output if this is an AJAX/JSON request
+$isAjaxRequest = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+$isJsonRequest = isset($_SERVER['CONTENT_TYPE']) && 
+                 strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+
 // Database configuration with Railway support
 $host = getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: 'localhost';
 $dbname = getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'dn_tours';
@@ -15,7 +21,9 @@ $mysqlUrl = getenv('MYSQL_URL');
 try {
     // Check if PDO MySQL driver is available
     if (!extension_loaded('pdo_mysql')) {
-        die("Connection failed: PDO MySQL driver is not installed. Please install php-pdo-mysql extension.");
+        $errorMsg = "Connection failed: PDO MySQL driver is not installed. Please install php-pdo-mysql extension.";
+        error_log($errorMsg);
+        throw new Exception($errorMsg);
     }
     
     // Parse MYSQL_URL if available (Railway format)
@@ -51,25 +59,37 @@ try {
         ]
     );
 } catch(PDOException $e) {
-    // More informative error message
+    // Log the error
     error_log("Database connection failed: " . $e->getMessage());
     
-    // Show helpful debug info in development
-    $errorMsg = "Connection failed: " . $e->getMessage();
+    // Store error info for scripts that need it
+    $db_error = $e->getMessage();
+    $db_connection_failed = true;
     
-    if (getenv('RAILWAY_ENVIRONMENT') === false) {
-        // Local development - show more details
-        $errorMsg .= "<br><br><strong>Debug Info:</strong><br>";
-        $errorMsg .= "Host: " . htmlspecialchars($host) . "<br>";
-        $errorMsg .= "Port: " . htmlspecialchars($port) . "<br>";
-        $errorMsg .= "Database: " . htmlspecialchars($dbname) . "<br>";
-        $errorMsg .= "User: " . htmlspecialchars($username) . "<br>";
-        $errorMsg .= "<br>Please check your database configuration.";
-    } else {
-        // Production - generic message
-        $errorMsg .= "<br><br>Please check your database configuration and ensure the MySQL service is running.";
+    // For JSON/API requests, let the calling script handle the error
+    // For regular page loads, show user-friendly error
+    if (!$isAjaxRequest && !$isJsonRequest && 
+        !in_array(basename($_SERVER['PHP_SELF']), ['get_reviews.php', 'submit_review.php'])) {
+        
+        $errorMsg = "Connection failed: " . $e->getMessage();
+        
+        if (getenv('RAILWAY_ENVIRONMENT') === false) {
+            // Local development - show more details
+            $errorMsg .= "<br><br><strong>Debug Info:</strong><br>";
+            $errorMsg .= "Host: " . htmlspecialchars($host) . "<br>";
+            $errorMsg .= "Port: " . htmlspecialchars($port) . "<br>";
+            $errorMsg .= "Database: " . htmlspecialchars($dbname) . "<br>";
+            $errorMsg .= "User: " . htmlspecialchars($username) . "<br>";
+            $errorMsg .= "<br>Please check your database configuration.";
+        } else {
+            // Production - generic message
+            $errorMsg .= "<br><br>Please check your database configuration and ensure the MySQL service is running.";
+        }
+        
+        die($errorMsg);
     }
     
-    die($errorMsg);
+    // For API requests, throw exception to be caught by calling script
+    throw $e;
 }
 ?>
