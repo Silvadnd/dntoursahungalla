@@ -6,11 +6,13 @@ $isJsonRequest = isset($_SERVER['CONTENT_TYPE']) &&
                  strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
 
 // Database configuration with Railway support
-$host = getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'dn_tours';
-$username = getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'root';
-$password = getenv('DB_PASSWORD') ?: getenv('MYSQLPASSWORD') ?: '';
-$port = getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: '3306';
+// Railway connection details (from Railway MySQL service)
+// These can also be set via environment variables for better security
+$host = getenv('MYSQLHOST') ?: (getenv('DB_HOST') ?: 'shuttle.proxy.rlwy.net');
+$dbname = getenv('MYSQLDATABASE') ?: (getenv('DB_NAME') ?: 'railway');
+$username = getenv('MYSQLUSER') ?: (getenv('DB_USER') ?: 'root');
+$password = getenv('MYSQLPASSWORD') ?: (getenv('DB_PASSWORD') ?: 'eTaArsItbOApYBCxEVGaupBEiqLkOFLN');
+$port = getenv('MYSQLPORT') ?: (getenv('DB_PORT') ?: '16503');
 
 // Check if we're on Railway (they provide RAILWAY_ENVIRONMENT)
 $isRailway = getenv('RAILWAY_ENVIRONMENT') !== false;
@@ -43,7 +45,8 @@ try {
     }
     
     // Build DSN with proper formatting for cloud hosting
-    $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+    // Use charset connection attribute for consistency
+    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
     
     $pdo = new PDO(
         $dsn,
