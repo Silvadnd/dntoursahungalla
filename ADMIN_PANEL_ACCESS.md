@@ -1,20 +1,15 @@
 # ✅ Admin Panel Access Guide
 
-## 🔑 Correct Login Credentials
+## 🔑 Login Credentials
 
-**✓ VERIFIED:**
-```
-Username: admin
-Password: admin123
-```
+The admin credentials are stored securely in the database with bcrypt encryption.
 
-**✗ NOT WORKING:**
-```
-Username: admin
-Password: admin
-```
+**To set credentials locally:**
+1. Copy `.env.example` to `.env`
+2. Update the values (do NOT commit `.env` to git)
+3. Credentials are loaded from environment variables
 
-The password is `admin123` (with "123" at the end), not just `admin`.
+⚠️ **IMPORTANT:** Never hardcode credentials in PHP files. Use environment variables instead.
 
 ---
 
@@ -24,17 +19,17 @@ The password is `admin123` (with "123" at the end), not just `admin`.
 ```
 URL: http://localhost/dntoursahungalla/php/admin_login.php
 Username: admin
-Password: admin123
-Click: Login
+Password: (Set in your local .env file)
 ```
 
 ### Railway Production (After Deployment)
 ```
 URL: https://yoursite.railway.app/php/admin_login.php
 Username: admin
-Password: admin123
-Click: Login
+Password: (Set via Railway environment variables)
 ```
+
+**Note:** Never hardcode passwords in PHP files. Always use environment variables.
 
 ---
 
@@ -176,24 +171,47 @@ Click: Login
 
 ---
 
-## 🔄 Password Reset (If Needed)
+## 🔄 Password Management (If Needed)
 
-### If You Forget Password
-Use this PHP script to reset:
+### Change Your Admin Password
 
+Use the secure password management endpoint:
+
+1. **Create a simple PHP script** (not committed to git):
 ```php
 <?php
+// This script should only be run locally, not deployed
 require_once 'php/config.php';
+require_once 'php/auth.php';
 
-$new_password = 'admin123'; // Change to new password
-$hashed = password_hash($new_password, PASSWORD_BCRYPT);
+$auth = new AdminAuth($pdo);
 
-$update = $pdo->prepare("UPDATE admin_users SET password = ? WHERE username = ?");
-$update->execute([$hashed, 'admin']);
-
-echo "✓ Password reset to: " . $new_password;
+// Change to your new password
+if ($auth->changePassword('admin', 'YourNewSecurePassword123')) {
+    echo "✓ Password changed successfully";
+} else {
+    echo "✗ Failed to change password";
+}
 ?>
 ```
+
+2. **Or use the API endpoint:**
+```php
+POST /php/manage_password.php
+Content-Type: application/json
+
+{
+    "action": "change_password",
+    "username": "admin",
+    "new_password": "YourNewSecurePassword123"
+}
+```
+
+### Password Requirements
+- Minimum 8 characters
+- Stored with bcrypt encryption (cost=12)
+- Never logged or displayed in plain text
+- Always transmitted over HTTPS on production
 
 ---
 
@@ -230,11 +248,12 @@ echo "✓ Password reset to: " . $new_password;
 | Field | Value |
 |-------|-------|
 | Username | admin |
-| Password | admin123 |
+| Password | Securely hashed with bcrypt (cost=12) |
 | User ID | 1 |
 | Status | Active |
 | Created | October 15, 2025 |
 | Database | Railway MySQL |
+| Authentication | php/auth.php (AdminAuth class) |
 
 ---
 
@@ -257,15 +276,20 @@ echo "✓ Password reset to: " . $new_password;
 - Start Apache service
 - Start MySQL service
 
-### Step 2: Open Admin Login
+### Step 2: Create .env File (Local Development Only)
+- Copy `.env.example` to `.env`
+- Update with your local/Railway credentials
+- Keep `.env` in .gitignore (never commit)
+
+### Step 3: Open Admin Login
 - Go to: `http://localhost/dntoursahungalla/php/admin_login.php`
 
-### Step 3: Login
+### Step 4: Login
 - Username: `admin`
-- Password: `admin123`
+- Password: Check your `.env` file for ADMIN_PASSWORD
 - Click: "Login"
 
-### Step 4: Explore
+### Step 5: Explore
 - Try uploading a photo
 - View existing reviews
 - Check contact messages
@@ -281,14 +305,16 @@ Your admin panel is ready to use! You can now:
 ✓ Access contact form messages  
 ✓ Manage your tour website content  
 
-**Default Credentials:**
-```
-admin / admin123
-```
+**Security Features:**
+- ✅ Passwords stored with bcrypt encryption (cost=12)
+- ✅ Credentials in environment variables, not in code
+- ✅ Session-based authentication with PHP
+- ✅ HTTPS on production (Railway)
+- ✅ Password verification through secure php/auth.php class
 
 ---
 
-**Last Updated:** November 3, 2025  
-**Status:** ✅ Verified and Working  
+**Last Updated:** December 4, 2025  
+**Status:** ✅ Secured with Encryption  
 **Database:** Railway MySQL  
-**Authentication:** bcrypt password hashing
+**Authentication:** php/auth.php (AdminAuth class) with bcrypt hashing
