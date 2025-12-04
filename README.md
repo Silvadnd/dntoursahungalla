@@ -104,20 +104,6 @@ php -S localhost:8000
 - Verify MySQL database is running in Railway
 - Check that database schema has been imported
 
-### Environment Variables Reference
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| DB_HOST | MySQL host | localhost |
-| DB_NAME | Database name | dn_tours |
-| DB_USER | Database user | root |
-| DB_PASSWORD | Database password | (empty) |
-| DB_PORT | Database port | 3306 |
-
-## Default Admin Credentials
-
-- Username: `admin`
-- Password: `admin123`
 
 **Important:** Change these credentials after first login!
 
